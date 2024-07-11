@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>User List</h2>
+<ul id="user-list">
+    {% for user in users %}
+        <li>
+            {{ user.username }}
+            <button onclick="sendInterest({{ user.id }})">Send Interest</button>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

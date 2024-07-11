@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+</head>
+<body>
+    <h1>Chat with {{ other_user.username }}</h1>
+    <div id="chat-log">
+        {% for message in messages %}
+            <p><strong>{{ message.sender.username }}:</strong> {{ message.content }}</p>
+        {% endfor %}
+    </div>
+    <form 
+        hx-ext="ws"
+        hx-post="{% url 'send_message' interest.id %}"
+        ws-connect="/ws/chat/{{ room_name }}/"
+        ws-send="message"
+        _="on htmx:afterRequest reset() me">
+        {% csrf_token %}
+        <input type="text" id="messageInput" name="message" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+    <a href="{% url 'chat_list' %}">Back to Chats</a>
+
+    <script>
+        document.addEventListener("htmx:wsMessage", function(evt) {
+            const data = JSON.parse(evt.detail);
+            const chatLog = document.getElementById('chat-log');
+            const message = document.createElement('p');
+            message.innerHTML = `<strong>${data.sender}:</strong> ${data.message}`;
+            chatLog.appendChild(message);
+        });
+    </script>
+</body>
+</html>
